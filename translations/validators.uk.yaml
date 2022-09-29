@@ -2,4 +2,9 @@ post:
   slug_unique: slug повинен бути унікальним
   blank_summary: Коротка інформація повинна бути заповнена
   blank_content: Контент не повинен бути пустим
-  too_short_content: Контент надто корткий. Мінімум - %limit%
+  too_short: Контент надто корткий. Мінімум - %limit%
+
+comment:
+  blank_content: Коментар не повинен бути пустим.
+  too_short_content: Коментар надто короткий. Максимум - %limit%.
+  too_long_content: Коментар надто довгий. Максимум - %limit%.

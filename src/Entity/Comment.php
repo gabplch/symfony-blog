@@ -20,7 +20,8 @@ class Comment
     private ?Post $post = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'comment.blank_content')]
+    #[Assert\Length(min: 5, max: 1000, minMessage: 'comment.too_short_content', maxMessage: 'comment.too_long_content')]
     private ?string $content = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
