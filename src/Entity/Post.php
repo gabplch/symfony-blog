@@ -27,11 +27,12 @@ class Post
     private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'post.blank_summary')]
     private ?string $summary = null;
 
     #[ORM\Column(type: Types::TEXT, length: 255)]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'post.blank_content')]
+    #[Assert\Length(min: 10, minMessage: 'post.too_short_content')]
     private ?string $content = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
