@@ -33,6 +33,7 @@ class SecurityController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var User $user */
             $user = $form->getData();
+            $user->addRole('ROLE_USER');
 
             $this->userRepository->save($user, true);
         }
