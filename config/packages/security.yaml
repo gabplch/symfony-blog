@@ -17,6 +17,11 @@ security:
                 enable_csrf: true
                 login_path: security_login
                 check_path: security_login
+                default_target_path: blog_index
+
+        logout:
+            path: security_logout
+            target: blog_index
 
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
