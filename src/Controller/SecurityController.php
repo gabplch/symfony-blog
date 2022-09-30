@@ -5,14 +5,11 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\RegistrationType;
 use App\Repository\UserRepository;
-use App\Security\SecurityAuthenticator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 
 class SecurityController extends AbstractController
 {
@@ -22,24 +19,23 @@ class SecurityController extends AbstractController
     }
 
     #[Route('/register', name: 'security_registration')]
-    public function registration(Request $request, UserAuthenticatorInterface $authenticator, SecurityAuthenticator $formAuthenticator, UserPasswordHasherInterface $hasher): Response
+    public function registration(Request $request): Response
     {
-        if ($this->getUser()) {
+        $user = $this->getUser();
+
+        if ($user) {
             return $this->redirectToRoute('blog_index');
         }
 
-        $form = $this->createForm(RegistrationType::class, new User());
+        $form = $this->createForm(RegistrationType::class, $user);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var User $user */
             $user = $form->getData();
             $user->addRole('ROLE_USER');
-            $user->setPassword($hasher->hashPassword($user, $user->getPassword()));
 
             $this->userRepository->save($user, true);
-
-            $authenticator->authenticateUser($user, $formAuthenticator, $request);
         }
 
         return $this->render('security/registration.html.twig', [
