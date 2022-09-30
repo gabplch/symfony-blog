@@ -4,3 +4,6 @@ title:
 
 action:
   publish_comment: Коментувати
+post:
+  search_for: 'messages'
+  search_no_results: 'messages'

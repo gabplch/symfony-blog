@@ -6,6 +6,7 @@ use App\Entity\Post;
 use App\Pagination\Paginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use function Symfony\Component\String\u;
 
 /**
  * @extends ServiceEntityRepository<Post>
@@ -51,5 +52,42 @@ class PostRepository extends ServiceEntityRepository
         ;
 
         return (new Paginator($qb))->paginate($page);
+    }
+
+    /**
+     * @return Post[]
+     */
+    public function findBySearchQuery(string $query, int $limit = Paginator::PAGE_SIZE): array
+    {
+        $searchTerms = $this->extractSearchTerms($query);
+
+        if (0 === \count($searchTerms)) {
+            return [];
+        }
+
+        $queryBuilder = $this->createQueryBuilder('p');
+
+        foreach ($searchTerms as $key => $term) {
+            $queryBuilder
+                ->orWhere('p.title LIKE :t_'.$key)
+                ->setParameter('t_'.$key, '%'.$term.'%')
+            ;
+        }
+
+        return $queryBuilder
+            ->orderBy('p.publishedAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    private function extractSearchTerms(string $searchQuery): array
+    {
+        $searchQuery = u($searchQuery)->replaceMatches('/[[:space:]]+/', ' ')->trim();
+        $terms = array_unique($searchQuery->split(' '));
+
+        return array_filter($terms, static function ($term) {
+            return 2 <= $term->length();
+        });
     }
 }

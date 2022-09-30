@@ -68,4 +68,30 @@ class BlogController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    #[Route('/search', name: 'blog_search', methods: ['GET'])]
+    public function search(Request $request, PostRepository $posts): Response
+    {
+        $query = $request->query->get('q', '');
+        $limit = $request->query->get('l', 10);
+
+        if (!$request->isXmlHttpRequest()) {
+            return $this->render('blog/search.html.twig', ['query' => $query]);
+        }
+
+        $foundPosts = $posts->findBySearchQuery($query, $limit);
+
+        $results = [];
+        foreach ($foundPosts as $post) {
+            $results[] = [
+                'title' => htmlspecialchars($post->getTitle(), \ENT_COMPAT | \ENT_HTML5),
+                'date' => $post->getPublishedAt()->format('M d, Y'),
+                'author' => htmlspecialchars($post->getAuthor()->getFullName(), \ENT_COMPAT | \ENT_HTML5),
+                'summary' => htmlspecialchars($post->getSummary(), \ENT_COMPAT | \ENT_HTML5),
+                'url' => $this->generateUrl('blog_post', ['slug' => $post->getSlug()]),
+            ];
+        }
+
+        return $this->json($results);
+    }
 }
