@@ -43,9 +43,8 @@ class PostRepository extends ServiceEntityRepository
     public function findLatest(int $page = 1): Paginator
     {
         $qb = $this->createQueryBuilder('p')
-            ->addSelect('a', 't')
+            ->addSelect('a')
             ->innerJoin('p.author', 'a')
-            ->leftJoin('p.tags', 't')
             ->where('p.publishedAt <= :now')
             ->orderBy('p.publishedAt', 'DESC')
             ->setParameter('now', new \DateTime())
