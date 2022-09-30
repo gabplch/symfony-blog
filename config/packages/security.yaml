@@ -23,7 +23,7 @@ security:
             custom_authenticator: App\Security\SecurityAuthenticator
 
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+         - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
