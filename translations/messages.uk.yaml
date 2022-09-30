@@ -1,0 +1,6 @@
+title:
+  add_comment: Додати коментар
+  comment_error: Виникла помилка підчас додавання коментаря
+
+action:
+  publish_comment: Коментувати
