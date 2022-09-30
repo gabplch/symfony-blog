@@ -20,4 +20,10 @@ class BlogController extends AbstractController
             'paginator' => $latestPosts,
         ]);
     }
+
+    #[Route('/posts/{slug}', name: 'blog_post', methods: ['GET'])]
+    public function postShow(Post $post): Response
+    {
+        return $this->render('blog/post/show.html.twig', ['post' => $post]);
+    }
 }
