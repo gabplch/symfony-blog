@@ -4,6 +4,12 @@ title:
 
 action:
   publish_comment: Коментувати
+  sign_in: Ввійти
+
 post:
-  search_for: 'messages'
-  search_no_results: 'messages'
+  search_for: Шукати
+  search_no_results: Результати відсутні
+  no_comments: Коментарі відстуні
+  commented_on: Коментовано
+  num_comments: Кількість коментарів
+  publish_a_comment: щоб коментувати
