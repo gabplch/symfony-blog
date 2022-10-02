@@ -8,6 +8,7 @@
         "@symfony/webpack-encore": "^4.0.0",
         "autoprefixer": "^10.4.12",
         "core-js": "^3.23.0",
+        "flowbite-typography": "^1.0.3",
         "postcss": "^8.4.16",
         "postcss-loader": "^7.0.1",
         "regenerator-runtime": "^0.13.9",

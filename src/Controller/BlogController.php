@@ -41,6 +41,7 @@ class BlogController extends AbstractController
     {
         $comment = new Comment();
         $comment->setAuthor($this->getUser());
+        $comment->setPublishedAt(new \DateTime());
         $post->addComment($comment);
 
         $form = $this->createForm(CommentType::class, $comment);
