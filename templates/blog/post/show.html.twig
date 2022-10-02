@@ -43,7 +43,7 @@
                             <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">{{ comment.author.fullName }}</p>
                             <p class="text-sm text-gray-600 dark:text-gray-400">
                                 <time pubdate datetime="{{ comment.publishedAt|date }}"
-                                      title="{{ comment.publishedAt|format_datetime('medium', 'short', '', 'UTC') }}">{{ comment.publishedAt|format_datetime('medium', 'short', '', 'UTC') }}
+                                      title="{{ comment.publishedAt|format_datetime('medium', 'short', '', 'Europe/Kiev') }}">{{ comment.publishedAt|format_datetime('medium', 'short', '', 'Europe/Kiev') }}
                                 </time>
                             </p>
                         </div>
