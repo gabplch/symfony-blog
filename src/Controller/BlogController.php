@@ -65,6 +65,24 @@ class BlogController extends AbstractController
         ]);
     }
 
+    #[Route('/{slug}/edit', name: 'post_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Post $post, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(PostType::class, $post);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            return $this->redirectToRoute('blog_post', ['slug' => $post->getSlug()]);
+        }
+
+        return $this->render('blog/post/edit.html.twig', [
+            'post' => $post,
+            'form' => $form->createView(),
+        ]);
+    }
+
     #[Route('/post/{slug}/delete', name: 'post_delete', methods: [Request::METHOD_POST])]
     public function deletePost(Post $post, EntityManagerInterface $entityManager): Response
     {
