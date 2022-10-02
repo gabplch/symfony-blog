@@ -1,0 +1,89 @@
+{% extends 'base/base.html.twig' %}
+
+{% block body %}
+    <div class="container mx-auto px-[150px] mt-2.5">
+    <article class="mb-4 lg:mb-6 not-format">
+        <address class="flex items-center mb-6 not-italic">
+            <div class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
+                <div>
+                    <p class="text-xl font-bold text-gray-900 dark:text-white">{{ post.title }}</p>
+                    <p class="text-base font-light text-gray-500 dark:text-gray-400">{{ post.summary }}</p>
+                    <p class="text-base font-light text-gray-500 dark:text-gray-400">{{ 'By'|trans }} {{ post.author.fullName }} {{ 'at'|trans }}
+                        <time pubdate datetime="{{ post.publishedAt|date }}"
+                              title="February 8th, 2022">{{ post.publishedAt|format_datetime('long', 'short', '', 'Europe/Kiev') }}</time>
+                    </p>
+                </div>
+            </div>
+        </address>
+    </article>
+    <div class="flex justify-between max-w-screen-xl ">
+        <article class="w-full max-w-2xl format format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
+            {{ post.content|markdown_to_html|sanitize_html }}
+            <!-- Coment section -->
+            <section class="not-format">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Discussion ({{ post.comments|length }})</h2>
+                </div>
+
+                {% if is_granted('ROLE_USER') %}
+                    {{ render(controller('App\\Controller\\BlogController::commentForm', {'id': post.id})) }}
+                {% else %}
+                    <p>
+                        <a class="btn btn-success"
+                           href="{{ path('security_login') }}">
+                            <i class="fa fa-sign-in" aria-hidden="true"></i> {{ 'action.sign_in'|trans }}
+                        </a>
+                        {{ 'post.publish_a_comment'|trans }}
+                    </p>
+                {% endif %}
+                {% for comment in post.comments %}
+                <article class="p-6 mb-6 text-base bg-white border-t border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+                    <footer class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">{{ comment.author.fullName }}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                <time pubdate datetime="{{ comment.publishedAt|date }}"
+                                      title="{{ comment.publishedAt|format_datetime('medium', 'short', '', 'Europe/Kiev') }}">{{ comment.publishedAt|format_datetime('medium', 'short', '', 'Europe/Kiev') }}
+                                </time>
+                            </p>
+                        </div>
+                        {% if is_granted('ROLE_USER') %}
+                            {% if is_granted('ROLE_ADMIN') or comment.author is same as app.user %}
+                                <button id="dropdownComment3Button" data-dropdown-toggle="dropdownComment3"
+                                        class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                                        type="button">
+                                    <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                                d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z">
+                                        </path>
+                                    </svg>
+                                    <span class="sr-only">Comment settings</span>
+                                </button>
+                                <!-- Dropdown menu -->
+                                <div id="dropdownComment3"
+                                     class="hidden z-10 w-36 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
+                                    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
+                                        aria-labelledby="dropdownMenuIconHorizontalButton">
+                                        <li>
+                                            <form action="{{ path('comment_delete', {'commentId': comment.id}) }}" method="post">
+                                                <button class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Remove</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </footer>
+                    <p>{{ comment.content|markdown_to_html|sanitize_html }}</p>
+                </article>
+                {% else %}
+                    <div class="post-comment">
+                        <p>{{ 'post.no_comments'|trans }}</p>
+                    </div>
+                {% endfor %}
+            </section>
+        </article>
+    </div>
+</div>
+{% endblock %}

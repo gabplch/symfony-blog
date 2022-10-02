@@ -1,0 +1,15 @@
+title:
+  add_comment: Додати коментар
+  comment_error: Виникла помилка підчас додавання коментаря
+
+action:
+  publish_comment: Коментувати
+  sign_in: Ввійти
+
+post:
+  search_for: Шукати
+  search_no_results: Результати відсутні
+  no_comments: Коментарі відстуні
+  commented_on: Коментовано
+  num_comments: Кількість коментарів
+  publish_a_comment: щоб коментувати

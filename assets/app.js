@@ -12,3 +12,4 @@ import './styles/app.css';
 import './bootstrap';
 
 require('flowbite/dist/flowbite');
+require('@fortawesome/fontawesome-free/css/all.min.css');
