@@ -7,6 +7,7 @@ use App\Entity\Post;
 use App\Form\CommentType;
 use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -58,6 +59,16 @@ class BlogController extends AbstractController
             'post' => $post,
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/comment/{commentId}/delete', name: 'comment_delete', methods: [Request::METHOD_POST])]
+    #[Entity('comment', expr: 'repository.find(commentId)')]
+    public function commentDrop(Comment $comment, EntityManagerInterface $entityManager): Response
+    {
+        $entityManager->remove($comment);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('blog_post', ['slug' => $comment->getPost()->getSlug()]);
     }
 
     public function commentForm(Post $post): Response
