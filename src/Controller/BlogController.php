@@ -37,7 +37,7 @@ class BlogController extends AbstractController
         return $this->render('blog/post/show.html.twig', ['post' => $post]);
     }
 
-    #[Route('/new', name: 'post_new', methods: ['GET', 'POST'])]
+    #[Route('/post/new', name: 'post_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $post = new Post();
@@ -63,6 +63,15 @@ class BlogController extends AbstractController
             'post' => $post,
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/post/{slug}/delete', name: 'post_delete', methods: [Request::METHOD_POST])]
+    public function deletePost(Post $post, EntityManagerInterface $entityManager): Response
+    {
+        $entityManager->remove($post);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('blog_index');
     }
 
     #[Route('/comment/{postSlug}/new', name: 'comment_new', methods: ['POST'])]
