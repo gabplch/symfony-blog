@@ -5,21 +5,22 @@
     {{ encore_entry_script_tags('search') }}
 {% endblock %}
 
-{% block body_id 'blog_search' %}
+{% block body %}
+    <div class="container mx-auto px-[150px] mt-2.5">
+        <form action="{{ path('blog_search') }}" method="get">
+                <div class="mb-6">
+                    <input name="q"
+                           class="search-field bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                           placeholder="{{ 'post.search_for'|trans }}"
+                           autocomplete="off"
+                           value="{{ query }}"
+                           autofocus
+                           data-no-results-message="{{ 'post.search_no_results'|trans }}"
+                    >
+            </div>
+        </form>
 
-{% block main %}
-    <form action="{{ path('blog_search') }}" method="get">
-        <div class="form-group">
-            <input name="q" class="form-control search-field" placeholder="{{ 'post.search_for'|trans }}" autocomplete="off" value="{{ query }}" autofocus data-no-results-message="{{ 'post.search_no_results'|trans }}">
+        <div id="results">
         </div>
-    </form>
-
-    <div id="results">
     </div>
-{% endblock %}
-
-{% block sidebar %}
-    {{ parent() }}
-
-    {{ show_source_code(_self) }}
 {% endblock %}
