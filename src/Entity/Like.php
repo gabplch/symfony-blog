@@ -19,7 +19,7 @@ class Like
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $User = null;
+    private ?User $user = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $_like = null;

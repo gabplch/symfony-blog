@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Like;
+use App\Entity\Post;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,28 +41,19 @@ class LikeRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Likes[] Returns an array of Likes objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('l.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    function getUserMark(Post $post, User $user): ?Like
+    {
+        $qb = $this->createQueryBuilder('_like');
 
-//    public function findOneBySomeField($value): ?Likes
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $qb
+            ->innerJoin('_like.post', 'post')
+            ->innerJoin('_like.user', 'user')
+            ->where('post.id = :post_id')
+            ->andWhere('user.id = :user_id')
+            ->setParameter('post_id', $post->getId())
+            ->setParameter('user_id', $user->getId())
+        ;
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }

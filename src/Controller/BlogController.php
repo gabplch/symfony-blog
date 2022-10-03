@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Like;
 use App\Entity\Post;
 use App\Form\CommentType;
 use App\Form\PostType;
+use App\Repository\LikeRepository;
 use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
@@ -14,6 +16,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,9 +35,14 @@ class BlogController extends AbstractController
     }
 
     #[Route('/posts/{slug}', name: 'blog_post', methods: ['GET'])]
-    public function postShow(Post $post): Response
+    public function postShow(Post $post, LikeRepository $likeRepository): Response
     {
-        return $this->render('blog/post/show.html.twig', ['post' => $post]);
+        $userLike = $likeRepository->getUserMark($post, $this->getUser());
+
+        return $this->render('blog/post/show.html.twig', [
+            'post' => $post,
+            'userMark' => $userLike,
+        ]);
     }
 
     #[Route('/post/new', name: 'post_new', methods: ['GET', 'POST'])]
@@ -162,5 +170,29 @@ class BlogController extends AbstractController
         }
 
         return $this->json($results);
+    }
+
+    #[Route('/post/{slug}/like/{mark}', name: 'like')]
+    public function like(Post $post, ?string $mark, LikeRepository $likeRepository): JsonResponse
+    {
+        $like = $likeRepository->getUserMark($post, $this->getUser());
+        $like = $like ?? new Like();
+
+        $mark = match ($mark) {
+            'null' => null,
+            'true' => true,
+            'false' => false,
+        };
+
+        $like->setUser($this->getUser());
+        $like->setPost($post);
+        $like->setLike($mark);
+
+        $likeRepository->save($like, true);
+
+        return new JsonResponse([
+            'mark' => $mark,
+            'post' => $post->getSlug(),
+        ], 200);
     }
 }
