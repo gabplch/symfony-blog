@@ -8,6 +8,8 @@
         "@symfony/webpack-encore": "^4.0.0",
         "autoprefixer": "^10.4.12",
         "core-js": "^3.23.0",
+        "highlight.js": "^11.6.0",
+        "imports-loader": "^0.8.0",
         "flowbite-typography": "^1.0.3",
         "postcss": "^8.4.16",
         "postcss-loader": "^7.0.1",
@@ -15,17 +17,21 @@
         "tailwindcss": "^3.1.8",
         "webpack": "^5.74.0",
         "webpack-cli": "^4.10.0",
-        "webpack-notifier": "^1.15.0"
+        "webpack-notifier": "^1.15.0",
+        "lato-font": "^3.0.0",
+        "sass": "^1.53.0",
+        "sass-loader": "^12.3",
+        "stimulus": "^2.0.0",
+        "typeahead.js": "^0.11.1",
+        "flowbite": "^1.5.3",
+        "jquery": "^3.6.1"
     },
-    "license": "UNLICENSED",
+    "license": "MIT",
     "private": true,
     "scripts": {
         "dev-server": "encore dev-server",
         "dev": "encore dev",
         "watch": "encore dev --watch",
         "build": "encore production --progress"
-    },
-    "dependencies": {
-        "flowbite": "^1.5.3"
     }
 }
