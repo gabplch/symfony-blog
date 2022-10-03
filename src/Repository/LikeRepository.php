@@ -56,4 +56,18 @@ class LikeRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getOneOrNullResult();
     }
+
+    function getPostLikeCnt(Post $post, bool $mark): int
+    {
+        $qb = $this->createQueryBuilder('_like');
+
+        $qb
+            ->where('_like.post = :post_id')
+            ->andWhere('_like._like = :mark')
+            ->setParameter('post_id', $post->getId())
+            ->setParameter('mark', $mark)
+        ;
+
+        return count($qb->getQuery()->getArrayResult());
+    }
 }

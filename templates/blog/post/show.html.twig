@@ -64,16 +64,22 @@
                 {% if app.user %}
                     <input type="hidden" id="post_slug" value="{{ post.slug }}">
                     <div class="flex flex-row">
-                        <button type="button" id="like"
-                                class="{% if userMark and userMark.like %} text-green-500 {% else %} hover:text-green-500 {% endif %}"
-                                {% if userMark and userMark.like %} active="" {% endif %}>
-                            <i class="fa fa-thumbs-up"></i>
-                        </button>
-                        <button type="button" id="dislike"
-                                class="ml-2 pt-2 {% if userMark and userMark.like is not null and not userMark.like %} text-red-500 {% else %} hover:text-red-500 {% endif %}"
-                                {% if userMark and userMark.like is not null and not userMark.like %} active="" {% endif %}>
-                            <i class="fa fa-thumbs-down"></i>
-                        </button>
+                        <div class="flex flex-row">
+                            <span id="likeCnt" class="pt-2 mr-1">{{likeCnt}}</span>
+                            <button type="button" id="like"
+                                    class="{% if userMark and userMark.like %} text-green-500 {% else %} hover:text-green-500 {% endif %}"
+                                    {% if userMark and userMark.like %} active="" {% endif %}>
+                                <i class="fa fa-thumbs-up"></i>
+                            </button>
+                        </div>
+                        <div class="flex flex-row ml-2 pt-2 ">
+                            <span id="dislikeCnt" class="mr-1">{{ dislikeCnt }}</span>
+                            <button type="button" id="dislike"
+                                    class="{% if userMark and userMark.like is not null and not userMark.like %} text-red-500 {% else %} hover:text-red-500 {% endif %}"
+                                    {% if userMark and userMark.like is not null and not userMark.like %} active="" {% endif %}>
+                                <i class="fa fa-thumbs-down"></i>
+                            </button>
+                        </div>
                     </div>
                 {% endif %}
                 <!-- Coment section -->
@@ -174,6 +180,11 @@
 
             $.ajax({
                 url: postUrl,
+                dataType: 'json',
+                success: function (data, status) {
+                    $('#likeCnt').text(data['likeCnt']);
+                    $('#dislikeCnt').text(data['dislikeCnt']);
+                }
             });
         }
 
@@ -188,10 +199,10 @@
             }
 
             if (dislike.attr('active') !== undefined) {
-                dislike.attr('class', 'ml-2 pt-2 text-red-500');
+                dislike.attr('class', 'text-red-500');
                 state = false;
             } else {
-                dislike.attr('class', 'ml-2 pt-2 hover:text-red-500');
+                dislike.attr('class', 'hover:text-red-500');
             }
 
             if (like.attr('active') === undefined && dislike.attr('active') === undefined) {

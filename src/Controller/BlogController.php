@@ -38,10 +38,14 @@ class BlogController extends AbstractController
     public function postShow(Post $post, LikeRepository $likeRepository): Response
     {
         $userLike = $likeRepository->getUserMark($post, $this->getUser());
+        $likeCnt = $likeRepository->getPostLikeCnt($post, true);
+        $dislikeCnt = $likeRepository->getPostLikeCnt($post, false);
 
         return $this->render('blog/post/show.html.twig', [
             'post' => $post,
             'userMark' => $userLike,
+            'likeCnt' => $likeCnt,
+            'dislikeCnt' => $dislikeCnt,
         ]);
     }
 
@@ -190,9 +194,12 @@ class BlogController extends AbstractController
 
         $likeRepository->save($like, true);
 
+        $likeCnt = $likeRepository->getPostLikeCnt($post, true);
+        $dislikeCnt = $likeRepository->getPostLikeCnt($post, false);
+
         return new JsonResponse([
-            'mark' => $mark,
-            'post' => $post->getSlug(),
-        ], 200);
+            'likeCnt' => $likeCnt,
+            'dislikeCnt' => $dislikeCnt,
+        ], Response::HTTP_OK);
     }
 }
