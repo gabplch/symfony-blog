@@ -3,9 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Like;
 use App\Entity\Post;
+use App\Entity\User;
 use App\Form\CommentType;
 use App\Form\PostType;
+use App\Repository\LikeRepository;
 use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
@@ -14,6 +17,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,9 +36,18 @@ class BlogController extends AbstractController
     }
 
     #[Route('/posts/{slug}', name: 'blog_post', methods: ['GET'])]
-    public function postShow(Post $post): Response
+    public function postShow(Post $post, LikeRepository $likeRepository): Response
     {
-        return $this->render('blog/post/show.html.twig', ['post' => $post]);
+        $userLike = $likeRepository->getUserMark($post, $this->getUser());
+        $likeCnt = $likeRepository->getPostLikeCnt($post, true);
+        $dislikeCnt = $likeRepository->getPostLikeCnt($post, false);
+
+        return $this->render('blog/post/show.html.twig', [
+            'post' => $post,
+            'userMark' => $userLike,
+            'likeCnt' => $likeCnt,
+            'dislikeCnt' => $dislikeCnt,
+        ]);
     }
 
     #[Route('/post/new', name: 'post_new', methods: ['GET', 'POST'])]
@@ -162,5 +175,35 @@ class BlogController extends AbstractController
         }
 
         return $this->json($results);
+    }
+
+    #[Route('/post/{slug}/like/{mark}', name: 'like')]
+    public function like(Post $post, ?string $mark, LikeRepository $likeRepository): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $like = $likeRepository->getUserMark($post, $user);
+        $like = $like ?? new Like();
+
+        $mark = match ($mark) {
+            'null' => null,
+            'true' => true,
+            'false' => false,
+        };
+
+        $like->setUser($user);
+        $like->setPost($post);
+        $like->setLike($mark);
+
+        $likeRepository->save($like, true);
+
+        $likeCnt = $likeRepository->getPostLikeCnt($post, true);
+        $dislikeCnt = $likeRepository->getPostLikeCnt($post, false);
+
+        return new JsonResponse([
+            'likeCnt' => $likeCnt,
+            'dislikeCnt' => $dislikeCnt,
+        ], Response::HTTP_OK);
     }
 }

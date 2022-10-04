@@ -1,5 +1,9 @@
 {% extends 'base/base.html.twig' %}
 
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
 {% block body %}
     <div class="container mx-auto px-[150px] mt-2.5">
         {% if is_granted('ROLE_ADMIN') or post.author is same as app.user %}
@@ -56,6 +60,28 @@
             <article
                     class="w-full max-w-2xl format format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
                 {{ post.content|markdown_to_html|sanitize_html }}
+                <!-- Like section -->
+                {% if app.user %}
+                    <input type="hidden" id="post_slug" value="{{ post.slug }}">
+                    <div class="flex flex-row">
+                        <div class="flex flex-row">
+                            <span id="likeCnt" class="pt-2 mr-1">{{likeCnt}}</span>
+                            <button type="button" id="like"
+                                    class="{% if userMark and userMark.like %} text-green-500 {% else %} hover:text-green-500 {% endif %}"
+                                    {% if userMark and userMark.like %} active="" {% endif %}>
+                                <i class="fa fa-thumbs-up"></i>
+                            </button>
+                        </div>
+                        <div class="flex flex-row ml-2 pt-2 ">
+                            <span id="dislikeCnt" class="mr-1">{{ dislikeCnt }}</span>
+                            <button type="button" id="dislike"
+                                    class="{% if userMark and userMark.like is not null and not userMark.like %} text-red-500 {% else %} hover:text-red-500 {% endif %}"
+                                    {% if userMark and userMark.like is not null and not userMark.like %} active="" {% endif %}>
+                                <i class="fa fa-thumbs-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
                 <!-- Coment section -->
                 <section class="not-format">
                     <div class="flex justify-between items-center mb-6">
@@ -87,7 +113,8 @@
                                     </p>
                                 </div>
                                 {% if is_granted('ROLE_ADMIN') or comment.author is same as app.user %}
-                                    <button id="dropdownComment{{ loop.index }}Button" data-dropdown-toggle="dropdownComment{{ loop.index }}"
+                                    <button id="dropdownComment{{ loop.index }}Button"
+                                            data-dropdown-toggle="dropdownComment{{ loop.index }}"
                                             class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
                                             type="button">
                                         <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
@@ -126,4 +153,73 @@
             </article>
         </div>
     </div>
+{% endblock %}
+{% block body_javascripts %}
+    <script>
+        let like = $('#like');
+        let dislike = $('#dislike');
+
+        function changeActiveState(mark1, mark2) {
+            if (mark1.attr('active') !== undefined) {
+                mark1.removeAttr('active');
+            } else {
+                mark1.attr('active', "");
+                if (mark2.attr('active') !== undefined) {
+                    mark2.removeAttr('active');
+                }
+            }
+        }
+
+        function performAjaxRequest(state) {
+            let postSlug = $('#post_slug').val();
+            let postMark = (state === undefined)? null: state;
+
+            let postUrl = "{{ path('like', {'slug': 'postSlug', 'mark': 'postMark'}) }}";
+            postUrl = postUrl.replace("postSlug", postSlug);
+            postUrl = postUrl.replace("postMark", postMark);
+
+            $.ajax({
+                url: postUrl,
+                dataType: 'json',
+                success: function (data, status) {
+                    $('#likeCnt').text(data['likeCnt']);
+                    $('#dislikeCnt').text(data['dislikeCnt']);
+                }
+            });
+        }
+
+        function postStateChange() {
+            let state;
+
+            if (like.attr('active') !== undefined) {
+                like.attr('class', 'text-green-500');
+                state = true;
+            } else {
+                like.attr('class', 'hover:text-green-500');
+            }
+
+            if (dislike.attr('active') !== undefined) {
+                dislike.attr('class', 'text-red-500');
+                state = false;
+            } else {
+                dislike.attr('class', 'hover:text-red-500');
+            }
+
+            if (like.attr('active') === undefined && dislike.attr('active') === undefined) {
+                state = undefined;
+            }
+
+            performAjaxRequest(state);
+        }
+
+        like.on('click', function () {
+            changeActiveState(like, dislike);
+            postStateChange();
+        });
+
+        dislike.on('click', function () {
+            changeActiveState(dislike, like);
+            postStateChange();
+        });
+    </script>
 {% endblock %}
