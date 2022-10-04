@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Comment;
 use App\Entity\Like;
 use App\Entity\Post;
+use App\Entity\User;
 use App\Form\CommentType;
 use App\Form\PostType;
 use App\Repository\LikeRepository;
@@ -179,7 +180,10 @@ class BlogController extends AbstractController
     #[Route('/post/{slug}/like/{mark}', name: 'like')]
     public function like(Post $post, ?string $mark, LikeRepository $likeRepository): JsonResponse
     {
-        $like = $likeRepository->getUserMark($post, $this->getUser());
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $like = $likeRepository->getUserMark($post, $user);
         $like = $like ?? new Like();
 
         $mark = match ($mark) {
@@ -188,7 +192,7 @@ class BlogController extends AbstractController
             'false' => false,
         };
 
-        $like->setUser($this->getUser());
+        $like->setUser($user);
         $like->setPost($post);
         $like->setLike($mark);
 
